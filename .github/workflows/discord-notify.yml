@@ -1,0 +1,23 @@
+name: Notify Discord on Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send message to Discord
+        env:
+          WEBHOOK_URL: https://discord.com/api/webhooks/1437202063665790977/muFrpFL6E-oFlOWZaHPFWhgRRzj1lOEfJvip4PHNcN0iZovP7wofoHT0oDhXDShzkXhz
+        run: |
+          STATUS="✅ Build passed!"
+          if [ "${{ job.status }}" != "success" ]; then
+            STATUS="❌ Build failed!"
+          fi
+
+          curl -H "Content-Type: application/json" \
+            -d "{\"content\": \"$STATUS\nRepo: $GITHUB_REPOSITORY\nCommit: $GITHUB_SHA\"}" \
+            $WEBHOOK_URL
